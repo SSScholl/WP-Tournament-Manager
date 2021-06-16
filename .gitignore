@@ -1,23 +1,69 @@
-# ignore everything in the root except the "wp-content" directory.
-!wp-content/
+# -----------------------------------------------------------------
+# .gitignore for WP-Tournament-Manager
+#
+# By default all files are ignored.  You'll need to whitelist
+# any mu-plugins, plugins, or themes you want to include in the repo.
+#
+# To ignore uncommitted changes in a file that is already tracked, use 
+# git update-index --assume-unchanged
+#
+# To stop tracking a file that is currently tracked, use 
+# git rm --cached
+#
+# Change Log:
+# 10/09/2020 Updating Repo to build locally
+# -----------------------------------------------------------------
 
-# ignore everything in the "wp-content" directory, except:
-# "mu-plugins", "plugins", "themes" directory
-wp-content/*
-!wp-content/mu-plugins/
-!wp-content/plugins/
-!wp-content/themes/
+vendor/*  
+.vscode/
+*.DS_Store
 
-# ignore these plugins
-wp-content/plugins/hello.php
+# ignore all files starting with . or ~
+.*
+~*
 
-# ignore specific themes
-wp-content/themes/twenty*/
-
-# ignore node dependency directories
+# ignore node dependency directories (used by grunt)
 node_modules/
+
+# ignore OS generated files
+ehthumbs.db
+Thumbs.db
+
+# ignore Editor files
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
 
 # ignore log files and databases
 *.log
 *.sql
 *.sqlite
+
+# ignore compiled files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# ignore packaged files
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# -------------------------
+# BEGIN Whitelisted Files
+# -------------------------
+
+# track these files, if they exist
+!.gitignore
+!README.*
+!CHANGELOG.*
+!composer.json
+!package.json
