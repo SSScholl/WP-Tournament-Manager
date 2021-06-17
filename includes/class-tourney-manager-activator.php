@@ -35,8 +35,8 @@ class Tourney_Manager_Activator {
 		/**
 		 * Custom Post Types
 		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-mnm_core-post_types.php';
-		$plugin_post_types = new MnM_Core_Post_Types();
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-post_types.php';
+		$plugin_post_types = new Tourney_Manager_Post_Types();
 
 		$plugin_post_types->create_custom_post_type();
 

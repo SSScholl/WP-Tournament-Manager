@@ -27,7 +27,8 @@
  * @subpackage Tourney_Manager/includes
  * @author     Michael Scholl <mls2scholl@gmail.com>
  */
-class Tourney_Manager {
+class Tourney_Manager
+{
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -66,8 +67,9 @@ class Tourney_Manager {
 	 *
 	 * @since    1.0.0
 	 */
-	public function __construct() {
-		if ( defined( 'TOURNEY_MANAGER_VERSION' ) ) {
+	public function __construct()
+	{
+		if (defined('TOURNEY_MANAGER_VERSION')) {
 			$this->version = TOURNEY_MANAGER_VERSION;
 		} else {
 			$this->version = '1.0.0';
@@ -78,7 +80,7 @@ class Tourney_Manager {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
+		$this->define_template_hooks();
 	}
 
 	/**
@@ -97,33 +99,51 @@ class Tourney_Manager {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies()
+	{
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tourney-manager-loader.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-tourney-manager-i18n.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-tourney-manager-admin.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-tourney-manager-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-tourney-manager-public.php';
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-tourney-manager-public.php';
+
+				/**
+		 * The class responsible for defining all actions creating the templates.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-tourney-manager-template-functions.php';
+
+		/**
+		 * The class responsible for all global functions.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/tourney-manager-global-functions.php';
+
+		/**
+		 * Custom Post Types
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-post_types.php';
+
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/pagetemlator.php';
 
 		$this->loader = new Tourney_Manager_Loader();
-
+		
 	}
 
 	/**
@@ -135,12 +155,12 @@ class Tourney_Manager {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale()
+	{
 
 		$plugin_i18n = new Tourney_Manager_i18n();
 
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
+		$this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 	}
 
 	/**
@@ -150,13 +170,28 @@ class Tourney_Manager {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks()
+	{
 
-		$plugin_admin = new Tourney_Manager_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Tourney_Manager_Admin($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 
+		// Save/Update our plugin options
+		$this->loader->add_action('admin_init', $plugin_admin, 'options_update');
+
+		// Add menu item
+		$this->loader->add_action('admin_menu', $plugin_admin, 'add_plugin_admin_menu');
+
+		// Add Settings link to the plugin
+		$plugin_basename = plugin_basename(plugin_dir_path(__DIR__) . $this->plugin_name . '.php');
+
+		$this->loader->add_filter('plugin_action_links_' . $plugin_basename, $plugin_admin, 'add_action_links');
+
+		$plugin_post_types = new Tourney_Manager_Post_Types();
+
+		$this->loader->add_action('init', $plugin_post_types, 'create_custom_post_type', 999);
 	}
 
 	/**
@@ -166,13 +201,48 @@ class Tourney_Manager {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks()
+	{
 
-		$plugin_public = new Tourney_Manager_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Tourney_Manager_Public($this->get_plugin_name(), $this->get_version());
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 
+		$this->loader->add_shortcode( 'my_shortcode_tag', $plugin_public, 'my_shortcode' );
+		
+		//$this->loader->add_filter('template_include', $plugin_public, 'get_custom_post_type_templates');
+
+		/**
+		 * Register shortcode via loader
+		 *
+		 * Use: [short-code-name args]
+		 *
+		 * @link https://github.com/DevinVinson/WordPress-Plugin-Boilerplate/issues/262
+		 */
+		//$this->loader->add_shortcode("shortcode-name", $plugin_public, "shortcode_function", $priority = 10, $accepted_args = 2);
+	}
+
+	/**
+	 * Register all of the hooks related to the templates.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_template_hooks()
+	{
+
+		$plugin_templates = new Tourney_Manager_Template_Functions($this->get_plugin_name(), $this->get_version());
+
+		$template_loader = new PageTemplater();
+
+		//$this->loader->add_action( 'plugins_loaded', $template_loader, 'get_instance', 10 );
+
+		// Loop
+		$this->loader->add_action('now-hiring-loop-content', $plugin_templates, 'content_job_title', 10, 2);
+
+		// Single
+		$this->loader->add_action('tourney-manager-single-content', $plugin_templates, 'single_post_title', 10);
 	}
 
 	/**
@@ -180,7 +250,8 @@ class Tourney_Manager {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run()
+	{
 		$this->loader->run();
 	}
 
@@ -191,7 +262,8 @@ class Tourney_Manager {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name()
+	{
 		return $this->plugin_name;
 	}
 
@@ -201,7 +273,8 @@ class Tourney_Manager {
 	 * @since     1.0.0
 	 * @return    Tourney_Manager_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader()
+	{
 		return $this->loader;
 	}
 
@@ -211,8 +284,8 @@ class Tourney_Manager {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version()
+	{
 		return $this->version;
 	}
-
 }
