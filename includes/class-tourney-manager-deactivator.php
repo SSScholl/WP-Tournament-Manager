@@ -20,7 +20,8 @@
  * @subpackage Tourney_Manager/includes
  * @author     Michael Scholl <mls2scholl@gmail.com>
  */
-class Tourney_Manager_Deactivator {
+class Tourney_Manager_Deactivator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -29,8 +30,7 @@ class Tourney_Manager_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
-
+	public static function deactivate()
+	{
 	}
-
 }

@@ -2,9 +2,10 @@
 
 /*
  * Template Name: Bracket Page
- * Description: A Page Template with a darker design.
+ * Description: 
  */
 
+get_header();
 ?>
 
 <head>

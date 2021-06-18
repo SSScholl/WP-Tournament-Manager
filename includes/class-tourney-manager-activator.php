@@ -20,7 +20,8 @@
  * @subpackage Tourney_Manager/includes
  * @author     Michael Scholl <mls2scholl@gmail.com>
  */
-class Tourney_Manager_Activator {
+class Tourney_Manager_Activator
+{
 
 	/**
 	 * Short Description. (use period)
@@ -124,6 +125,50 @@ class Tourney_Manager_Activator {
 				winner_id bigint(20) unsigned NOT NULL default '0',
 				PRIMARY KEY  (game_id)
 		   	) $charset_collate; ";
+
+			dbDelta($sql_create_table);
+			add_option('mnm_core_db_version', $mnm_core_db_version);
+		}
+
+		/**
+		 * wptournreg_participants testing
+		 */
+		$table_name = $wpdb->prefix . "wptournreg_participants";
+		if (
+			$wpdb->get_var("show tables like '{$table_name}'") != $table_name ||
+			version_compare($mnm_core_db_version, '1.0') < 0
+		) {
+			$sql_create_table = "CREATE TABLE $table_name (
+				id mediumint(9) NOT NULL AUTO_INCREMENT,
+				tournament_id varchar(32) NOT NULL,
+				time int(64) DEFAULT 0 NOT NULL,
+				lastname tinytext DEFAULT '' NOT NULL,
+				firstname tinytext DEFAULT '' NOT NULL,
+				email tinytext NOT NULL,
+				phone1 varchar(64) DEFAULT '' NOT NULL,
+				phone2 varchar(32) DEFAULT '' NOT NULL,
+				rating1 mediumint(9) DEFAULT NULL,
+				rating2 mediumint(9) DEFAULT NULL,
+				affiliation tinytext DEFAULT '' NOT NULL,
+				message text DEFAULT '' NOT NULL,
+				approved bool DEFAULT FALSE NOT NULL,
+				protected bool DEFAULT FALSE NOT NULL,
+				fee_is_paid bool DEFAULT FALSE NOT NULL,
+				gender bool DEFAULT FALSE NOT NULL,
+				birthyear mediumint(9) DEFAULT NULL,
+				postcode varchar(12) NOT NULL,
+				city varchar(32) NOT NULL,
+				address varchar(128) NOT NULL,
+				ip varchar(32) NOT NULL,
+				custom1 tinytext DEFAULT '' NOT NULL,
+				custom2 tinytext DEFAULT '' NOT NULL,
+				custom3 tinytext DEFAULT '' NOT NULL,
+				custom4 tinytext DEFAULT '' NOT NULL,
+				custom5 tinytext DEFAULT '' NOT NULL,
+				hash varchar(32) DEFAULT NULL,
+				UNIQUE (hash),
+				PRIMARY KEY (id)
+			) $charset_collate;";
 
 			dbDelta($sql_create_table);
 			add_option('mnm_core_db_version', $mnm_core_db_version);

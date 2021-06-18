@@ -126,14 +126,24 @@ class Tourney_Manager
 		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-tourney-manager-public.php';
 
 		/**
+		 * The class responsible for defining all shortcode functions.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-tourney-manager-shortcodes.php';
+
+		/**
 		 * Custom Post Types
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-post_types.php';
 
+		/**
+		 * The class responsible for defining all templates.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-manager-template-loader.php';
 
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-tourney-template-loader.php';
-
-		$this->loader = new Tourney_Template_Loader();
+		/**
+		 * Class responsible for adding template hooks.
+		 */
+		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-tourney-manager-template-functions.php';
 
 		$this->loader = new Tourney_Manager_Loader();
 	}
@@ -196,12 +206,17 @@ class Tourney_Manager
 	private function define_public_hooks()
 	{
 
+		$test = new Tourney_Template_Loader();
+
 		$plugin_public = new Tourney_Manager_Public($this->get_plugin_name(), $this->get_version());
 
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
 		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
 
-		$this->loader->add_shortcode('my_shortcode_tag', $plugin_public, 'my_shortcode');
+		$plugin_shortcodes = new Tourney_Manager_Shortcodes($this->get_plugin_name(), $this->get_version());
+		$this->loader->add_shortcode('my_shortcode_tag', $plugin_shortcodes, 'my_shortcode');
+		$this->loader->add_shortcode('tourney_form', $plugin_shortcodes, 'tourney_get_form');
+		$this->loader->add_shortcode('tourney_field', $plugin_shortcodes, 'tourney_get_fields');
 	}
 
 	/**
@@ -213,7 +228,11 @@ class Tourney_Manager
 	private function define_template_hooks()
 	{
 
-		//$plugin_templates = new Tourney_Manager_Template_Functions($this->get_plugin_name(), $this->get_version());
+		$plugin_templates = new Tourney_Manager_Template_Functions($this->get_plugin_name(), $this->get_version());
+
+		$this->loader->add_action('admin_post_nopriv_wptournreg_add_participant', $plugin_templates, 'wptournreg_add_participant');
+
+		//$this->loader->add_action( 'plugins_loaded', $template_loader, 'get_instance', 10 );
 
 		// Loop
 		//$this->loader->add_action('now-hiring-loop-content', $plugin_templates, 'content_job_title', 10, 2);
@@ -221,7 +240,6 @@ class Tourney_Manager
 		// Single
 		//$this->loader->add_action('tourney-manager-single-content', $plugin_templates, 'single_post_title', 10);
 	}
-
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
 	 *

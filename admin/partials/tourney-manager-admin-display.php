@@ -13,10 +13,9 @@
  */
 
 // If this file is called directly, abort.
-if ( ! defined( 'WPINC' ) ) die;
+if (!defined('WPINC')) die;
 ?>
 
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
 <div class="wrap">
     <h2>Plugin Name <?php esc_attr_e('Options', 'plugin_name'); ?></h2>
 

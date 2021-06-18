@@ -21,24 +21,6 @@ class Tourney_Template_Loader
 	protected $templates;
 
 	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
-
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
-	private $version;
-
-	/**
 	 * Returns an instance of this class.
 	 */
 	public static function get_instance()
@@ -95,6 +77,7 @@ class Tourney_Template_Loader
 		// Add your templates to this array.
 		$this->templates = array(
 			'bracket-page.php' => 'Bracket Page',
+			'goodtobebad-template.php' => 'It\'s Good to Be Bad',
 		);
 	}
 
@@ -186,3 +169,4 @@ class Tourney_Template_Loader
 		return $template;
 	}
 }
+add_action('plugins_loaded', array('Tourney_Template_Loader', 'get_instance'));

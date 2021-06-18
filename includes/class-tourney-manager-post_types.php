@@ -273,8 +273,7 @@ class Tourney_Manager_Post_Types
                 'custom_caps_users'     => array(
                     'administrator',
                 ),
-                'taxonomies'            => array(
-                ),
+                'taxonomies'            => array(),
             ),
         );
 
